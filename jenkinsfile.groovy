@@ -7,6 +7,7 @@ pipeline {
     }
     environment {
         DATETIME = sh(script: '''printf $(TZ=Etc/UCT date '+%FT%T%:z')''', , returnStdout: true)
+        GIT_ACCOUNT = credentials("easonlai")
     }
     stages {
         stage("Initialization") {
@@ -16,12 +17,9 @@ pipeline {
         }
         stage('Git clone repo') {
             steps {
-                step(
-                    [$class: 'WsCleanup']
-                )
                 checkout([
                     $class: 'GitSCM', 
-                    branches: [[name: '*/FB/ierosodin/gen_by_docker']], 
+                    branches: [[name: '*/master']], 
                     doGenerateSubmoduleConfigurations: true, 
                     extensions: [[$class: 'SubmoduleOption',
                                   parentCredentials: true,
@@ -40,12 +38,15 @@ pipeline {
                 '''
             }
         }
-        stage('Copy license stage') {
+        stage('Save license stage') {
             steps {
                 sh label: '', script: '''
                 docker cp ${DATETIME//[:,+]/-}:IAI/${customer}/${machine}/${uuid}/${DATETIME} record
-                docker cp ${DATETIME//[:,+]/-}:IAI/${customer}/${machine}/${uuid}/config.py record/
                 docker rm ${DATETIME//[:,+]/-}
+                cp -rf record IAI/${customer}/${machine}/${uuid}/${DATETIME}
+                # git add IAI/${customer}/${machine}/${uuid}/${DATETIME}
+                # git commit -m "Build from Jenkins: IAI/${customer}/${machine}/${uuid}/${DATETIME}"
+                # git push https://${GIT_ACCOUNT_USR}:${GIT_ACCOUNT_PSW}@gitlab.wisen.ai/industryai/licensegenerator.git HEAD:master
                 '''
             }
         }
