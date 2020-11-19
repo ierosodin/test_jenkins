@@ -33,6 +33,7 @@ pipeline {
                     submoduleCfg: [],
                     userRemoteConfigs: [[credentialsId: 'easonlai', url: 'https://gitlab.wisen.ai/industryai/licensegenerator.git']]
                 ])
+                sh "pwd && ls"
             }
         }
         stage('Build license stage') {
