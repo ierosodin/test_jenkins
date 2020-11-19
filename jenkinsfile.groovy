@@ -10,13 +10,6 @@ pipeline {
         GIT_ACCOUNT = credentials("easonlai")
     }
     stages {
-        stage("Clean workspace") {
-            steps {
-                step(
-                    [$class: 'WsCleanup']
-                )
-            }
-        }
         stage("Initialization") {
             steps {
                 buildName "#${BUILD_NUMBER} ${customer}/${machine}/${uuid}/${env.DATETIME}"
@@ -24,6 +17,9 @@ pipeline {
         }
         stage('Git clone repo') {
             steps {
+                step(
+                    [$class: 'WsCleanup']
+                )
                 checkout([
                     $class: 'GitSCM', 
                     branches: [[name: '*/master']], 
