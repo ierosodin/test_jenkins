@@ -17,6 +17,7 @@ pipeline {
         }
         stage('Git clone repo') {
             steps {
+                sh 'pwd && ls'
                 checkout([
                     $class: 'GitSCM', 
                     branches: [[name: '*/master']], 
